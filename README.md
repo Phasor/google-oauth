@@ -1,5 +1,5 @@
 Following https://www.makeuseof.com/nodejs-google-authentication/
 
-Simple express app secured using JWTs and Google OAuth.
+Simple Express.js API, secured using JWTs and Google OAuth.
 
-You can only access the /profile route once you have authenticated with Google OAuth and received a JWT which needs to be sent in the Authorization header of the request to /profile.
+React front end allows the user to log in with their Google account via the Express API.
