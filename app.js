@@ -1,13 +1,19 @@
-// https://www.makeuseof.com/nodejs-google-authentication/
-// trying to follow the above tutorial
 const express = require('express');
 const passport = require("passport");
 require("./passportConfig")(passport);
 require('dotenv').config();
+const cors = require('cors');
 require('./db');
 const jwt = require("jsonwebtoken")
+var path = require('path');
 
 const app = express();
+
+//set middleware
+app.use(express.json());  // Instead of using body-parser middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors()); // allows our front end application to make HTTP requests to Express application
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -16,12 +22,7 @@ app.get('/', (req, res) => {
 // Redirect the user to the Google signin page 
 app.get("/auth/google", passport.authenticate("google", { scope: ["email", "profile"] }));
 
-// // Retrieve user data using the access token received 
-// app.get("/auth/google/callback", passport.authenticate('google', { session: false }),
-//     (req, res) => {
-//         res.redirect("/profile/");
-// });
-
+// Retrieve user data using the access token received 
 app.get("/auth/google/callback", passport.authenticate('google', { session: false }),
     (req, res) => {
         jwt.sign(
@@ -32,22 +33,16 @@ app.get("/auth/google/callback", passport.authenticate('google', { session: fals
                 if (err) {
                     return res.json({token: null, error: err});
                 }
-                res.json({token: token});
+                //res.json({token: token});
+                res.redirect(`http://localhost:3000/home?token=${token}`);
             }
         );
     }
 );
 
-
-// // profile route after successful sign in
-// app.get("/profile", (req, res) => { 
-//     console.log(req);
-//     res.send("Welcome");
-// });
-
-app.get("/profile", passport.authenticate('jwt', { session: false }),
+app.get("/secret", passport.authenticate('jwt', { session: false }),
     (req, res, next) => {
-        res.send("Welcome");
+        res.json({ success: true, msg: 'pixie' });
     }
 );
 
